@@ -65,7 +65,7 @@ async def denoise(procedure, image, drawable, force_cpu, config_path_output):
     proc = await asyncio.create_subprocess_exec(python_path, plugin_path,
                                                 stdout=asyncio.subprocess.PIPE)
 
-    Gimp.progress_init("GIMP AI Denoising")
+    Gimp.progress_init("GIMP ML Denoising")
     async for line in proc.stdout:
         Gimp.progress_update(float(line.rstrip()))
         # Yield to GTK main loop so UI updates

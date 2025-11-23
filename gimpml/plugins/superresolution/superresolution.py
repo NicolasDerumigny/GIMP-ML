@@ -80,7 +80,7 @@ async def super_resolution(
                                                 stdout=asyncio.subprocess.PIPE)
 
 
-    Gimp.progress_init("GIMP AI SuperResolution")
+    Gimp.progress_init("GIMP ML SuperResolution")
     async for line in proc.stdout:
         Gimp.progress_update(float(line.rstrip()))
         # Yield to GTK main loop so UI updates
