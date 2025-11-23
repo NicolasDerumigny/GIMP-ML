@@ -44,6 +44,7 @@ def get_denoise(Img, cpu_flag=False, weight_path=None):
         zeroout=0,
     )
     c = 1 if opt.color == 0 else 3
+    print("0.05")
     model = DnCNN_c(channels=c, num_of_layers=opt.num_of_layers, num_of_est=2 * c)
     model_est = Estimation_direct(c, 2 * c)
     # device_ids = [0]
@@ -71,11 +72,8 @@ def get_denoise(Img, cpu_flag=False, weight_path=None):
     model.eval()
     model_est.load_state_dict(ckpt_est)
     model_est.eval()
-    try:
-        gimp.progress_update(float(0.005))
-        gimp.displays_flush()
-    except:
-        pass
+    print("0.1")
+    sys.stdout.flush()
     Img = Img[:, :, ::-1]  # change it to RGB
     Img = cv2.resize(Img, (0, 0), fx=opt.scale, fy=opt.scale)
     if opt.color == 0:
@@ -114,8 +112,17 @@ def get_denoise(Img, cpu_flag=False, weight_path=None):
                 )
             merge_out[i:i_end, j:j_end, :] = patch_merge_out_numpy
             j = j_end
+            print(
+                0.1 + 0.9*(
+                    float(i)/w + ((float(i_end)-i)/w)*(float(j)/h)
+                )
+            )
+            sys.stdout.flush()
             idx = idx + 1
         i = i_end
+
+    print(1)
+    sys.stdout.flush()
 
     return merge_out[:, :, ::-1]
 
