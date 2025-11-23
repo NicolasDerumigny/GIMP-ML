@@ -31,9 +31,10 @@ def get_super(input_image, s=4, cpu_flag=False, fFlag=True, weight_path=None):
     cuda = opt.cuda
 
     if cuda:
-        model = torch.load(opt.model)["model"]
+        model = torch.load(opt.model, weights_only=False)["model"]
     else:
-        model = torch.load(opt.model, map_location=torch.device("cpu"))["model"]
+        model = torch.load(opt.model, map_location=torch.device("cpu"),
+                           weights_only=False)["model"]
 
     im_input = input_image.astype(np.float32).transpose(2, 0, 1)
     im_input = im_input.reshape(
@@ -46,6 +47,8 @@ def get_super(input_image, s=4, cpu_flag=False, fFlag=True, weight_path=None):
         im_input = im_input.cuda()
     else:
         model = model.cpu()
+
+    print("0.1")
 
     if fFlag:
         im_h = np.zeros([4 * w, 4 * h, 3])
@@ -64,6 +67,12 @@ def get_super(input_image, s=4, cpu_flag=False, fFlag=True, weight_path=None):
 
                 im_h[4 * i: 4 * i_end, 4 * j: 4 * j_end, :] = HR_4x
                 j = j_end
+                print(
+                    0.1 + 0.9*(
+                        float(i)/w + ((float(i_end)-i)/w)*(float(j)/h)
+                    )
+                )
+                sys.stdout.flush()
 
             i = i_end
     else:
@@ -75,6 +84,10 @@ def get_super(input_image, s=4, cpu_flag=False, fFlag=True, weight_path=None):
         im_h = np.clip(im_h, 0.0, 255.0)
         im_h = im_h.transpose(1, 2, 0).astype(np.uint8)
     im_h = cv2.resize(im_h, (0, 0), fx=s / 4, fy=s / 4)
+
+    print(1)
+    sys.stdout.flush()
+
     return im_h
 
 

@@ -31,7 +31,7 @@ def colorpalette(procedure, run_mode, image, n_drawables, drawable, args, data):
             )
         ),
     )
-    result_layer = result.get_active_layer()
+    result_layer = result.get_selected_drawables()[0]
     copy = Gimp.Layer.new_from_drawable(result_layer, image_new)
     copy.set_name("Color Palette")
     copy.set_mode(Gimp.LayerMode.NORMAL_LEGACY)  # DIFFERENCE_LEGACY

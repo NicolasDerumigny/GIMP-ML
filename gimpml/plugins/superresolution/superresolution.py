@@ -13,6 +13,7 @@ Y88b  d88P   888   888   "   888 888             888   "   888 888
 
 Performs super-resolution on currently selected layer.
 """
+import asyncio
 import gi
 gi.require_version("Gimp", "3.0")
 gi.require_version("GimpUi", "3.0")
@@ -44,14 +45,13 @@ image_paths = {
 }
 
 
-def super_resolution(
+async def super_resolution(
     procedure,
     image,
     drawable,
     scale,
     filter,
     force_cpu,
-    progress_bar,
     config_path_output,
 ):
     # Save inference parameters and layers
@@ -76,7 +76,20 @@ def super_resolution(
         )
 
     # Run inference and load as layer
-    subprocess.call([python_path, plugin_path])
+    proc = await asyncio.create_subprocess_exec(python_path, plugin_path,
+                                                stdout=asyncio.subprocess.PIPE)
+
+
+    Gimp.progress_init("GIMP AI SuperResolution")
+    async for line in proc.stdout:
+        Gimp.progress_update(float(line.rstrip()))
+        # Yield to GTK main loop so UI updates
+        while GLib.main_context_default().iteration(False):
+            pass
+
+    await proc.wait()
+    Gimp.progress_init("")
+
     with open(os.path.join(weight_path, "..", "gimp_ml_run.pkl"), "rb") as file:
         data_output = pickle.load(file)
     if data_output["inference_status"] == "success":
@@ -85,7 +98,7 @@ def super_resolution(
                 Gimp.RunMode.NONINTERACTIVE,
                 Gio.file_new_for_path(os.path.join("/tmp", "cache.png")),
             )
-            result_layer = result.get_active_layer()
+            result_layer = result.get_selected_drawables()[0]
             copy = Gimp.Layer.new_from_drawable(result_layer, image)
             copy.set_name("Super-resolution")
             copy.set_mode(Gimp.LayerMode.NORMAL_LEGACY)  # DIFFERENCE_LEGACY
@@ -99,7 +112,7 @@ def super_resolution(
                 Gimp.RunMode.NONINTERACTIVE,
                 Gio.File.new_for_path(os.path.join("/tmp", "cache.png")),
             )
-            result_layer = result.get_active_layer()
+            result_layer = result.get_selected_drawables()[0]
             copy = Gimp.Layer.new_from_drawable(result_layer, image_new)
             copy.set_name("Super-resolution")
             copy.set_mode(Gimp.LayerMode.NORMAL_LEGACY)  # DIFFERENCE_LEGACY
@@ -130,9 +143,9 @@ def super_resolution(
 
 
 def run(procedure, run_mode, image, drawable, args, data):
-    scale = args.index(0)
-    filter = args.index(1)
-    force_cpu = args.index(2)
+    scale = args.get_property("scale")
+    filter = args.get_property("filter")
+    force_cpu = args.get_property("force_cpu")
 
     if run_mode == Gimp.RunMode.INTERACTIVE:
         # Get all paths
@@ -221,32 +234,30 @@ def run(procedure, run_mode, image, drawable, args, data):
         grid.attach(spin, 3, 0, 1, 1)
         spin.show()
 
-        progress_bar = Gtk.ProgressBar()
-        vbox.add(progress_bar)
-        progress_bar.show()
-
         # Wait for user to click
         dialog.show()
         while True:
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
+                dialog.destroy()
                 scale = config.get_property("scale")
                 filter = config.get_property("filter")
                 force_cpu = config.get_property("force_cpu")
-                result = super_resolution(
+                result = asyncio.run(super_resolution(
                     procedure,
                     image,
-                    layer,
+                    drawable,
                     scale,
                     filter,
                     force_cpu,
-                    progress_bar,
                     config_path_output,
-                )
+                ))
                 # If the execution was successful, save parameters so they will be restored next time we show dialog.
                 if result.index(0) == Gimp.PDBStatusType.SUCCESS and config is not None:
-                    pass #config.end_run(Gimp.PDBStatusType.SUCCESS)
-                return result
+                    return result
+                return procedure.new_return_values(
+                    Gimp.PDBStatusType.CANCEL, GLib.Error()
+                )
             elif response == Gtk.ResponseType.APPLY:
                 url = "https://kritiksoman.github.io/GIMP-ML-Docs/docs-page.html#item-7-10"
                 Gio.app_info_launch_default_for_uri(url, None)
@@ -299,8 +310,10 @@ class SuperResolution(Gimp.PlugIn):
             procedure.set_menu_label(N_("_Super Resolution..."))
             procedure.set_attribution("Kritik Soman", "GIMP-ML", "2021")
             procedure.add_menu_path("<Image>/Layer/GIMP-ML/")
-            procedure.add_argument_from_property(self, "scale")
-            procedure.add_argument_from_property(self, "filter")
+            procedure.add_double_argument("scale", _("_Scale"), _("Scale"), 1, 4,
+                2, GObject.ParamFlags.READWRITE)
+            procedure.add_boolean_argument("filter", _("Use _Filter"), 
+                _("Use as Filter"), False, GObject.ParamFlags.READWRITE)
             procedure.add_boolean_argument("force_cpu", _("Force CPU"), _("Force CPU execution"), False, GObject.ParamFlags.READWRITE) 
 
         return procedure

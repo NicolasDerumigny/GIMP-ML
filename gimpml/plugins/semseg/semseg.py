@@ -67,7 +67,7 @@ def semseg(procedure, image, drawable, force_cpu, progress_bar, config_path_outp
             Gimp.RunMode.NONINTERACTIVE,
             Gio.file_new_for_path(os.path.join("/tmp", "cache.png")),
         )
-        result_layer = result.get_active_layer()
+        result_layer = result.get_selected_drawables()[0]
         copy = Gimp.Layer.new_from_drawable(result_layer, image)
         copy.set_name("Semantic Segmentation")
         copy.set_mode(Gimp.LayerMode.NORMAL_LEGACY)  # DIFFERENCE_LEGACY

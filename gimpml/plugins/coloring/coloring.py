@@ -77,7 +77,7 @@ def coloring(procedure, image, n_drawables, drawables, force_cpu, progress_bar, 
             Gimp.RunMode.NONINTERACTIVE,
             Gio.file_new_for_path(os.path.join("/tmp", "cache.png")),
         )
-        result_layer = result.get_active_layer()
+        result_layer = result.get_selected_drawables()[0]
         copy = Gimp.Layer.new_from_drawable(result_layer, image)
         copy.set_name("Coloring")
         copy.set_mode(Gimp.LayerMode.NORMAL_LEGACY)  # DIFFERENCE_LEGACY
@@ -222,7 +222,7 @@ def run(procedure, run_mode, image, drawable, args, data):
                     Gimp.RunMode.NONINTERACTIVE,
                     Gio.file_new_for_path(image_paths["colorpalette"]),
                 )
-                result_layer = result.get_active_layer()
+                result_layer = result.get_selected_drawables()[0]
                 copy = Gimp.Layer.new_from_drawable(result_layer, image_new)
                 copy.set_name("Color Palette")
                 copy.set_mode(Gimp.LayerMode.NORMAL_LEGACY)  # DIFFERENCE_LEGACY
