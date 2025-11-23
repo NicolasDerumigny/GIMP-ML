@@ -190,7 +190,7 @@ def run(procedure, run_mode, args):
                 procedure, args_dict, config_path_output
             )
             if result.index(0) == Gimp.PDBStatusType.SUCCESS and config is not None:
-                config.end_run(Gimp.PDBStatusType.SUCCESS)
+                pass #config.end_run(Gimp.PDBStatusType.SUCCESS)
             return result
         elif response == Gtk.ResponseType.APPLY:
             url = "https://kritiksoman.github.io/GIMP-ML-Docs/docs-page.html#item-7-15"
@@ -218,9 +218,6 @@ class FilterFolder(Gimp.PlugIn):
 
     ## GimpPlugIn virtual methods ##
     def do_query_procedures(self):
-        self.set_translation_domain(
-            "gimp30-python", Gio.file_new_for_path(Gimp.locale_directory())
-        )
         return ["filterfolder"]
 
     def do_create_procedure(self, name):

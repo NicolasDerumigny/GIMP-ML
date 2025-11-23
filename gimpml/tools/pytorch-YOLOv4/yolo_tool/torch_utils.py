@@ -8,7 +8,6 @@ from torch.autograd import Variable
 
 import itertools
 import struct  # get_image_size
-import imghdr  # get_image_size
 
 from yolo_tool import utils
 
@@ -60,7 +59,7 @@ def get_region_boxes(boxes_and_confs):
     # confs: [batch, num1 + num2 + num3, num_classes]
     boxes = torch.cat(boxes_list, dim=1)
     confs = torch.cat(confs_list, dim=1)
-        
+
     return [boxes, confs]
 
 
@@ -88,7 +87,7 @@ def do_detect(model, img, conf_thresh, nms_thresh, use_cuda=1):
     if use_cuda:
         img = img.cuda()
     img = torch.autograd.Variable(img)
-    
+
     t1 = time.time()
 
     output = model(img)

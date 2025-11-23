@@ -85,7 +85,7 @@ if __name__ == "__main__":
             output = get_deepcolor(
                 image1, image2, cpu_flag=force_cpu, weight_path=weight_path
             )
-        cv2.imwrite(os.path.join(weight_path, "..", "cache.png"), output[:, :, ::-1])
+        cv2.imwrite(os.path.join("/tmp", "cache.png"), output[:, :, ::-1])
         with open(os.path.join(weight_path, "..", "gimp_ml_run.pkl"), "wb") as file:
             pickle.dump({"inference_status": "success", "force_cpu": force_cpu}, file)
 

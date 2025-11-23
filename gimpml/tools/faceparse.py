@@ -106,10 +106,10 @@ if __name__ == "__main__":
     with open(os.path.join(weight_path, "..", "gimp_ml_run.pkl"), "rb") as file:
         data_output = pickle.load(file)
     force_cpu = data_output["force_cpu"]
-    image = cv2.imread(os.path.join(weight_path, "..", "cache.png"))[:, :, ::-1]
+    image = cv2.imread(os.path.join("/tmp", "cache.png"))[:, :, ::-1]
     try:
         output = get_face(image, cpu_flag=force_cpu, weight_path=weight_path)
-        cv2.imwrite(os.path.join(weight_path, "..", "cache.png"), output[:, :, ::-1])
+        cv2.imwrite(os.path.join("/tmp", "cache.png"), output[:, :, ::-1])
         with open(os.path.join(weight_path, "..", "gimp_ml_run.pkl"), "wb") as file:
             pickle.dump({"inference_status": "success", "force_cpu": force_cpu}, file)
 

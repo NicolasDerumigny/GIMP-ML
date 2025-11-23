@@ -96,7 +96,7 @@ if __name__ == "__main__":
     get_predict_image = data_output["get_predict_image"]
     image1, image_path = None, None
     if get_predict_image:
-        image1 = cv2.imread(os.path.join(weight_path, "..", "cache.png"))
+        image1 = cv2.imread(os.path.join("/tmp", "cache.png"))
     else:
         image_path = data_output["image_path"]
         search_objects = [x.lower().strip() for x in data_output["objects"].split("|")]
@@ -104,7 +104,7 @@ if __name__ == "__main__":
         if get_predict_image:
             count = 0
             output = get_detect_objects(image=image1, cpu_flag=force_cpu, weight_path=weight_path, get_predict_image=True)[0]
-            cv2.imwrite(os.path.join(weight_path, "..", "cache.png"), output)
+            cv2.imwrite(os.path.join("/tmp", "cache.png"), output)
         else:
             count = 0
             output = get_detect_objects(image_path=image_path, cpu_flag=force_cpu, weight_path=weight_path)

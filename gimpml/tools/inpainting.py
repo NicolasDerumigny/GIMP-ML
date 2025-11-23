@@ -166,7 +166,7 @@ if __name__ == "__main__":
                 weight_path=weight_path,
             )
         output = cv2.resize(output, (w, h))
-        cv2.imwrite(os.path.join(weight_path, "..", "cache.png"), output[:, :, ::-1])
+        cv2.imwrite(os.path.join("/tmp", "cache.png"), output[:, :, ::-1])
         with open(os.path.join(weight_path, "..", "gimp_ml_run.pkl"), "wb") as file:
             pickle.dump(
                 {

@@ -4,7 +4,7 @@ import sys
 import cv2
 
 plugin_loc = os.path.dirname(os.path.realpath(__file__)) + "/"
-base_loc = os.path.expanduser("~") + "/GIMP-ML/"
+base_loc = "/tmp"
 # base_loc = "D:/PycharmProjects/"
 sys.path.extend([plugin_loc + "MiDaS"])
 # data_path = "D:/PycharmProjects/GIMP3-ML-pip/gimpml/"

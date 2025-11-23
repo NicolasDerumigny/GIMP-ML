@@ -44,9 +44,6 @@ class ColorPalette(Gimp.PlugIn):
     __gproperties__ = {}
 
     def do_query_procedures(self):
-        self.set_translation_domain(
-            "gimp30-python", Gio.file_new_for_path(Gimp.locale_directory())
-        )
         return ["colorpalette"]
 
     def do_create_procedure(self, name):

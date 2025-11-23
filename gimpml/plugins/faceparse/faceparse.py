@@ -53,7 +53,7 @@ def faceparse(procedure, image, drawable, force_cpu, progress_bar, config_path_o
     Gimp.context_push()
     image.undo_group_start()
 
-    save_image(image, drawable, os.path.join(weight_path, "..", "cache.png"))
+    save_image(image, drawable, os.path.join("/tmp", "cache.png"))
 
     with open(os.path.join(weight_path, "..", "gimp_ml_run.pkl"), "wb") as file:
         pickle.dump({"force_cpu": bool(force_cpu), "inference_status": "started"}, file)
@@ -67,7 +67,7 @@ def faceparse(procedure, image, drawable, force_cpu, progress_bar, config_path_o
     if data_output["inference_status"] == "success":
         result = Gimp.file_load(
             Gimp.RunMode.NONINTERACTIVE,
-            Gio.file_new_for_path(os.path.join(weight_path, "..", "cache.png")),
+            Gio.file_new_for_path(os.path.join("/tmp", "cache.png")),
         )
         result_layer = result.get_active_layer()
         copy = Gimp.Layer.new_from_drawable(result_layer, image)
@@ -94,8 +94,8 @@ def faceparse(procedure, image, drawable, force_cpu, progress_bar, config_path_o
         return procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
 
 
-def run(procedure, run_mode, image, n_drawables, layer, args, data):
-    force_cpu = args.index(0)
+def run(procedure, run_mode, image, drawable, args, data):
+    force_cpu = args.get_property("force_cpu")
 
     if run_mode == Gimp.RunMode.INTERACTIVE:
         # Get all paths
@@ -109,7 +109,7 @@ def run(procedure, run_mode, image, n_drawables, layer, args, data):
 
         config = procedure.create_config()
         config.set_property("force_cpu", force_cpu)
-        config.begin_run(image, run_mode, args)
+
 
         GimpUi.init("faceparse.py")
         use_header_bar = Gtk.Settings.get_default().get_property(
@@ -170,11 +170,11 @@ def run(procedure, run_mode, image, n_drawables, layer, args, data):
             if response == Gtk.ResponseType.OK:
                 force_cpu = config.get_property("force_cpu")
                 result = faceparse(
-                    procedure, image, layer, force_cpu, progress_bar, config_path_output
+                    procedure, image, drawable, force_cpu, progress_bar, config_path_output
                 )
                 # If the execution was successful, save parameters so they will be restored next time we show dialog.
                 if result.index(0) == Gimp.PDBStatusType.SUCCESS and config is not None:
-                    config.end_run(Gimp.PDBStatusType.SUCCESS)
+                    pass #config.end_run(Gimp.PDBStatusType.SUCCESS)
                 return result
             elif response == Gtk.ResponseType.APPLY:
                 url = "https://kritiksoman.github.io/GIMP-ML-Docs/docs-page.html#item-7-9"
@@ -201,9 +201,6 @@ class FaceParse(Gimp.PlugIn):
 
     ## GimpPlugIn virtual methods ##
     def do_query_procedures(self):
-        self.set_translation_domain(
-            "gimp30-python", Gio.file_new_for_path(Gimp.locale_directory())
-        )
         return ["faceparse"]
 
     def do_create_procedure(self, name):
@@ -225,7 +222,7 @@ class FaceParse(Gimp.PlugIn):
             procedure.set_menu_label(N_("_Face Parse..."))
             procedure.set_attribution("Kritik Soman", "GIMP-ML", "2021")
             procedure.add_menu_path("<Image>/Layer/GIMP-ML/")
-            procedure.add_argument_from_property(self, "force_cpu")
+            procedure.add_boolean_argument("force_cpu", _("Force CPU"), _("Force CPU execution"), False, GObject.ParamFlags.READWRITE) 
         return procedure
 
 

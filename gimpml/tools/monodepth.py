@@ -36,13 +36,13 @@ if __name__ == "__main__":
     weight_path = get_weight_path()
     with open(os.path.join(weight_path, "..", "gimp_ml_run.pkl"), "rb") as file:
         data_output = pickle.load(file)
-    image = cv2.imread(os.path.join(weight_path, "..", "cache.png"))[:, :, ::-1]
+    image = cv2.imread(os.path.join("/tmp", "cache.png"))[:, :, ::-1]
     force_cpu = data_output["force_cpu"]
     try:
         output = get_mono_depth(image, cpu_flag=force_cpu, weight_path=weight_path)
 
         cv2.imwrite(
-            os.path.join(weight_path, "..", "cache.png"),
+            os.path.join("/tmp", "cache.png"),
             output.astype("uint16"),
             [cv2.IMWRITE_PNG_COMPRESSION, 0],
         )

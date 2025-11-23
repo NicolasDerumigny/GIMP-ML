@@ -21,10 +21,10 @@ if __name__ == "__main__":
         data_output = pickle.load(file)
     min_val = data_output["min_val"]
     max_val = data_output["max_val"]
-    image = cv2.imread(os.path.join(weight_path, "..", "cache.png"))[:, :, ::-1]
+    image = cv2.imread(os.path.join("/tmp", "cache.png"))[:, :, ::-1]
     try:
         output = get_edge(image, min_val=min_val, max_val=max_val)
-        cv2.imwrite(os.path.join(weight_path, "..", "cache.png"), output[:, :, ::-1])
+        cv2.imwrite(os.path.join("/tmp", "cache.png"), output[:, :, ::-1])
         with open(os.path.join(weight_path, "..", "gimp_ml_run.pkl"), "wb") as file:
             pickle.dump({"inference_status": "success"}, file)
 

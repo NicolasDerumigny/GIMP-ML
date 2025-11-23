@@ -54,7 +54,7 @@ def canny(
     Gimp.context_push()
     image.undo_group_start()
 
-    save_image(image, drawable, os.path.join(weight_path, "..", "cache.png"))
+    save_image(image, drawable, os.path.join("/tmp", "cache.png"))
 
     with open(os.path.join(weight_path, "..", "gimp_ml_run.pkl"), "wb") as file:
         pickle.dump(
@@ -76,7 +76,7 @@ def canny(
     if data_output["inference_status"] == "success":
         result = Gimp.file_load(
             Gimp.RunMode.NONINTERACTIVE,
-            Gio.file_new_for_path(os.path.join(weight_path, "..", "cache.png")),
+            Gio.file_new_for_path(os.path.join("/tmp", "cache.png")),
         )
         result_layer = result.get_active_layer()
         copy = Gimp.Layer.new_from_drawable(result_layer, image)
@@ -101,7 +101,7 @@ def canny(
         return procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
 
 
-def run(procedure, run_mode, image, n_drawables, layer, args, data):
+def run(procedure, run_mode, image, drawable, args, data):
     min_val = args.index(0)
     max_val = args.index(1)
 
@@ -116,7 +116,7 @@ def run(procedure, run_mode, image, n_drawables, layer, args, data):
         config_path_output["plugin_path"] = os.path.join(config_path, "canny.py")
 
         config = procedure.create_config()
-        config.begin_run(image, run_mode, args)
+
 
         GimpUi.init("canny.py")
         use_header_bar = Gtk.Settings.get_default().get_property(
@@ -197,7 +197,7 @@ def run(procedure, run_mode, image, n_drawables, layer, args, data):
                 )
                 # If the execution was successful, save parameters so they will be restored next time we show dialog.
                 if result.index(0) == Gimp.PDBStatusType.SUCCESS and config is not None:
-                    config.end_run(Gimp.PDBStatusType.SUCCESS)
+                    pass #config.end_run(Gimp.PDBStatusType.SUCCESS)
                 return result
             elif response == Gtk.ResponseType.APPLY:
                 url = "https://kritiksoman.github.io/GIMP-ML-Docs/docs-page.html#item-7-16"
@@ -235,9 +235,6 @@ class Canny(Gimp.PlugIn):
 
     ## GimpPlugIn virtual methods ##
     def do_query_procedures(self):
-        self.set_translation_domain(
-            "gimp30-python", Gio.file_new_for_path(Gimp.locale_directory())
-        )
         return ["canny"]
 
     def do_create_procedure(self, name):
