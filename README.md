@@ -1,12 +1,23 @@
 <img src="https://github.com/kritiksoman/tmp/blob/master/cover.png" width="1280" height="180"> <br>
 
+# Fork information
+Fork of the original GIMP-ML plugin suite, updated for (partial) GIMP 3.10 compatibility.
+
+Known issues:
+- Models weights link is missing
+- `Install.bat` is uncomplete
+- Windows is (very probably) broken
+- All untested plugins are very likely to crash. PR are welcome!
 
 
+Tested plugins:
+- denoise
+
+# Documentation
 | [![Open Docs](https://img.shields.io/badge/VIEW-DOCS-green)](https://kritiksoman.github.io/GIMP-ML-Docs/) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kritiksoman/GIMP-ML/blob/GIMP3-ML/testscases/Demo%20Notebook.ipynb)  |
 | ------------- |:-------------:| 
 |<img src="https://github.com/kritiksoman/tmp/blob/master/gimpml.gif" width="320" height="485">|  This branch is under development. <br>Dedicated for GIMP 3 and Python 3.<br> :star: :star: :star: :star: are welcome.<br> Waiting for GIMP 3 to release officially.<br>|
 
-# Documentation
 https://kritiksoman.github.io/GIMP-ML-Docs/index.html
 
 # Objectives
@@ -16,9 +27,7 @@ https://kritiksoman.github.io/GIMP-ML-Docs/index.html
 [4] Add AI to routine image editing workflows. <br>
 
 # Contribution 
-[<img src="http://img.youtube.com/vi/vFFNp0xhEiU/0.jpg" width="800" height="600">](http://www.youtube.com/watch?v=vFFNp0xhEiU)<br> <br>
 Welcome people interested in contribution !! 
-Join us on Slack --> [<img src="https://woocommerce.com/wp-content/uploads/2015/02/Slack_RGB.png" width="130" height="50">](https://join.slack.com/t/gimp-mlworkspace/shared_invite/zt-rbaxvztx-GRvj941idw3sQ0trS686YA)<br>
 Contribution guidelines available --> [Link](https://github.com/kritiksoman/GIMP-ML/blob/GIMP3-ML/CONTRIBUTION.md).<br>
 
 # Use as a Python Package
@@ -48,7 +57,6 @@ On windows, run for CPU: <br>
 On windows, run for GPU: <br>
 ```GIMP-ML\install.bat gpu```<br>
 [4] Follow steps that are printed in terminal or cmd. <br>
-FYI: weights link --> [Link](https://drive.google.com/drive/folders/1AtuIkGH7gqD9e5Tb-Y7wM9sLAZPyP_Mq?usp=sharing)
 
 
 | Windows | Linux |
