@@ -9,6 +9,7 @@ Known issues:
 - Windows is (very probably) broken
 - All untested plugins are very likely to crash. PR are welcome!
 - Super-Resolution with filter crashs
+- Wrong location of `gimp_ml_config.pkl`
 
 
 Tested plugins:
