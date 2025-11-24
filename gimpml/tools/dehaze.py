@@ -19,6 +19,9 @@ def get_dehaze(data_hazy, cpu_flag=False, weight_path=None):
     data_hazy = data_hazy / 255.0
     data_hazy = torch.from_numpy(data_hazy).float()
     data_hazy = data_hazy.permute(2, 0, 1)
+    print(0.05)
+    sys.stdout.flush()
+
     dehaze_net = net.dehaze_net()
 
     if torch.cuda.is_available() and not cpu_flag:
