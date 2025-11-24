@@ -1,8 +1,11 @@
-from models.networks import get_generator_new
+from models.networks import get_generator
 
+from collections import OrderedDict
 # from aug import get_normalize
 import torch
+import os
 import numpy as np
+import sys
 
 config = {
     "project": "deblur_gan",
@@ -85,16 +88,15 @@ config = {
 
 class Predictor:
     def __init__(self, weights_path, model_name="", cf=False):
-        # model = get_generator(model_name or config['model'])
-        model = get_generator_new(weights_path[0:-11])
-        model.load_state_dict(
-            torch.load(weights_path, map_location=lambda storage, loc: storage)["model"]
-        )
+        model = get_generator(config["model"])
+        model.load_state_dict(torch.load(weights_path, map_location=lambda storage, loc: storage)["model"])
         if torch.cuda.is_available() and not cf:
             self.model = model.cuda()
         else:
             self.model = model
         self.model.train(True)
+        print("0.05")
+        sys.stdout.flush()
         # GAN inference should be in train mode to use actual stats in norm layers,
         # it's not a bug
         # self.normalize_fn = get_normalize()
@@ -137,6 +139,8 @@ class Predictor:
 
     def __call__(self, img, mask, ignore_mask=True, cf=False):
         (img, mask), h, w = self._preprocess(img, mask)
+        print("0.10")
+        sys.stdout.flush()
         with torch.no_grad():
             if torch.cuda.is_available() and not cf:
                 inputs = [img.cuda()]
@@ -145,4 +149,6 @@ class Predictor:
             if not ignore_mask:
                 inputs += [mask]
             pred = self.model(*inputs)
+        print("0.95")
+        sys.stdout.flush()
         return self._postprocess(pred)[:h, :w, :]

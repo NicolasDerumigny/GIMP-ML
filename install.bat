@@ -24,7 +24,7 @@ if [ "${PYTHON}" != "" ]; then #
     virtualenv -p python venv #
     source venv/bin/activate #
     ${PYTHON} -m pip install "numpy<2" #
-    ${PYTHON} -m pip install torch torchvision torchaudio #
+    ${PYTHON} -m pip install torch torchvision torchaudio six #
     ${PYTHON} -m pip install . #
     ${PYTHON} -c "import gimpml; gimpml.setup_python_weights()" #
     PYTHON_FOLDER=`ls -d ~/.config/GIMP/3.0/plug-ins/GIMP-ML/venv/lib/python*` #

@@ -13,6 +13,7 @@ Y88b  d88P   888   888   "   888 888             888   "   888 888
 
 Deblur the current layer.
 """
+import asyncio
 import gi
 gi.require_version("Gimp", "3.0")
 gi.require_version("GimpUi", "3.0")
@@ -44,7 +45,7 @@ image_paths = {
 }
 
 
-def deblur(procedure, image, drawable, force_cpu, progress_bar, config_path_output):
+async def deblur(procedure, image, drawable, force_cpu, config_path_output):
     # Save inference parameters and layers
     weight_path = config_path_output["weight_path"]
     python_path = config_path_output["python_path"]
@@ -59,7 +60,20 @@ def deblur(procedure, image, drawable, force_cpu, progress_bar, config_path_outp
         pickle.dump({"force_cpu": bool(force_cpu), "inference_status": "started"}, file)
 
     # Run inference and load as layer
-    subprocess.call([python_path, plugin_path])
+    proc = await asyncio.create_subprocess_exec(python_path, plugin_path,
+                                                stdout=asyncio.subprocess.PIPE)
+
+
+    Gimp.progress_init("GIMP ML Deblur")
+    async for line in proc.stdout:
+        Gimp.progress_update(float(line.rstrip()))
+        # Yield to GTK main loop so UI updates
+        while GLib.main_context_default().iteration(False):
+            pass
+
+    await proc.wait()
+    Gimp.progress_init("")
+
     with open(os.path.join(weight_path, "..", "gimp_ml_run.pkl"), "rb") as file:
         data_output = pickle.load(file)
     image.undo_group_end()
@@ -159,24 +173,22 @@ def run(procedure, run_mode, image, drawable, args, data):
         vbox.pack_start(label, False, False, 1)
         label.show()
 
-        progress_bar = Gtk.ProgressBar()
-        vbox.add(progress_bar)
-        progress_bar.show()
-
         # Wait for user to click
         dialog.show()
         while True:
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
+                dialog.destroy()
                 force_cpu = config.get_property("force_cpu")
-                result = deblur(
-                    procedure, image, drawable, force_cpu, progress_bar, config_path_output
-                )
-                # super_resolution(procedure, image, n_drawables, layer, force_cpu, progress_bar, config_path_output)
+                result = result = asyncio.run(deblur(
+                    procedure, image, drawable, force_cpu, config_path_output
+                ))
                 # If the execution was successful, save parameters so they will be restored next time we show dialog.
                 if result.index(0) == Gimp.PDBStatusType.SUCCESS and config is not None:
-                    pass #config.end_run(Gimp.PDBStatusType.SUCCESS)
-                return result
+                    return result
+                return procedure.new_return_values(
+                    Gimp.PDBStatusType.CANCEL, GLib.Error()
+                )
             elif response == Gtk.ResponseType.APPLY:
                 url = "https://kritiksoman.github.io/GIMP-ML-Docs/docs-page.html#item-7-3"
                 Gio.app_info_launch_default_for_uri(url, None)

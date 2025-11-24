@@ -5,6 +5,7 @@ import functools
 from torch.autograd import Variable
 import numpy as np
 import sys
+import os
 
 if sys.version_info.major > 2:
     from models.fpn_mobilenet import FPNMobileNet
@@ -395,9 +396,7 @@ def get_generator(model_config):
             norm_layer=get_norm_layer(norm_type=model_config["norm_layer"])
         )
     elif generator_name == "fpn_inception":
-        # model_g = FPNInception(norm_layer=get_norm_layer(norm_type=model_config['norm_layer']))
-        # torch.save(model_g, 'mymodel.pth')
-        model_g = torch.load("mymodel.pth")
+        model_g = FPNInception(norm_layer=get_norm_layer(norm_type=model_config['norm_layer']))
     elif generator_name == "fpn_inception_simple":
         model_g = FPNInceptionSimple(
             norm_layer=get_norm_layer(norm_type=model_config["norm_layer"])
@@ -411,13 +410,6 @@ def get_generator(model_config):
         )
     else:
         raise ValueError("Generator Network [%s] not recognized." % generator_name)
-
-    return nn.DataParallel(model_g)
-
-
-def get_generator_new(weights_path):
-
-    model_g = torch.load(weights_path + "mymodel.pth")
 
     return nn.DataParallel(model_g)
 

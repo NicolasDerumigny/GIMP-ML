@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
 
-# from pretrainedmodels import inceptionresnetv2
-# from torchsummary import summary
+import pretrainedmodels
 import torch.nn.functional as F
 
 
@@ -94,7 +93,7 @@ class FPN(nn.Module):
         """
 
         super(FPN, self).__init__()
-        self.inception = inceptionresnetv2(num_classes=1000, pretrained="imagenet")
+        self.inception = pretrainedmodels.inceptionresnetv2(num_classes=1000, pretrained="imagenet")
         # self.inception = torch.load('inceptionresnetv2-520b38e4.pth')
         self.enc0 = self.inception.conv2d_1a
         self.enc1 = nn.Sequential(

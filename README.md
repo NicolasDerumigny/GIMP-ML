@@ -7,11 +7,11 @@ Known issues:
 - Models weights link is missing
 - Windows is (very probably) broken
 - All untested plugins are very likely to crash. PR are welcome!
-- Super-Resolution with filter crashs
 
 Tested plugins:
 - denoise
-- superresolution (without filter)
+- superresolution
+- deblur
 
 # Documentation
 | [![Open Docs](https://img.shields.io/badge/VIEW-DOCS-green)](https://kritiksoman.github.io/GIMP-ML-Docs/) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kritiksoman/GIMP-ML/blob/GIMP3-ML/testscases/Demo%20Notebook.ipynb)  |
