@@ -13,23 +13,26 @@ BATCH
 echo '**** GIMP-ML Setup started ****'
 if python --version 2>&1 | grep -q '^Python 3\.'; then #
     echo 'Python 3 found.' #
-    virtualenv -p python venv #
-    source venv/bin/activate #
-    python -m pip install "numpy<2" #
-    python -m pip install torch torchvision torchaudio #
-    python -m pip install . #
-    python -c "import gimpml; gimpml.setup_python_weights()" #
-    deactivate #
+    PYTHON=python
 elif python3 --version 2>&1 | grep -q '^Python 3\.'; then #
     echo 'Python 3 found.' #
-    virtualenv -p python3 venv #
-    source venv/bin/activate #
-    python3 -m pip install "numpy<2" #
-    python3 -m pip install torch torchvision torchaudio #
-    python3 -m pip install . #
-    python3 -c "import gimpml; gimpml.setup_python_weights()" #
-    deactivate #
+    PYTHON=python3
 else #
     echo 'Python 3 NOT found' #
+fi #
+if [ "${PYTHON}" != "" ]; then #
+    virtualenv -p python venv #
+    source venv/bin/activate #
+    ${PYTHON} -m pip install "numpy<2" #
+    ${PYTHON} -m pip install torch torchvision torchaudio #
+    ${PYTHON} -m pip install . #
+    ${PYTHON} -c "import gimpml; gimpml.setup_python_weights()" #
+    PYTHON_FOLDER=`ls -d ~/.config/GIMP/3.0/plug-ins/GIMP-ML/venv/lib/python*` #
+    cp ~/.config/GIMP/3.0/plug-ins/GIMP-ML/gimpml/tools/gimp_ml_config.pkl ${PYTHON_FOLDER}/site-packages/gimpml/tools/gimp_ml_config.pkl #
+    PLUG_INS=`ls -d ~/.config/GIMP/3.0/plug-ins/GIMP-ML/gimpml/plugins/*/` #
+    for i in ${PLUG_INS}; do #
+        ln -s $i ~/.config/GIMP/3.0/plug-ins/ #
+    done #
+    deactivate #
 fi #
 echo '*** GIMP-ML Setup Ended ****'

@@ -5,12 +5,9 @@ Fork of the original GIMP-ML plugin suite, updated for (partial) GIMP 3.10 compa
 
 Known issues:
 - Models weights link is missing
-- `Install.bat` is uncomplete
 - Windows is (very probably) broken
 - All untested plugins are very likely to crash. PR are welcome!
 - Super-Resolution with filter crashs
-- Wrong location of `gimp_ml_config.pkl`
-
 
 Tested plugins:
 - denoise
